@@ -75,14 +75,16 @@ define([
 
       steps.forEach((step, i) => {
         const editorDiv = sections[i].querySelector(".editor");
-        const monaco = editor(editorDiv, step.code.trim(), {
+        const monaco = editor(editorDiv, step.code, {
           language: "javascript",
           lineNumbers: false,
           automaticLayout: true,
           renderLineHighlight: false,
           selectionHighlight: false,
+          scrollBeyondLastLine:false,
           scrollbar: {
             horizontal: "hidden",
+            vertical: "auto",
             verticalScrollbarSize: 9
           },
           //fontFamily: `Consolas, "Courier New", monospace`,
@@ -94,7 +96,7 @@ define([
 
         const lineHeight = monaco.getConfiguration().lineHeight;
         const lineCount = monaco.getModel().getLineCount();
-        const contentHeight = Math.min(lineHeight * lineCount, 350);
+        const contentHeight = lineHeight * lineCount;
 
         editorDiv.style.height = contentHeight + "px";
 
