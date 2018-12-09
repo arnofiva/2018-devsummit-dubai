@@ -63,25 +63,16 @@ define([
         //  Step 0: Add Scene Layer
         //
         /////////////////////////////////////////////////////////////////////////////////
-        {
-          title: "Add 3D Content",
-          code: `
-          var l = new SceneLayer( 
-            portalItem: {
-              id: "73df987984b24094b848d580eb83b0fb"
-            }
-          );
-          // OR
-          var l = new SceneLayer( 
-            url: "https://..."
-          );
-          `,
-          before: function(){
-          },
-          run:function(){
-          }
-        },
+//         {
+//           title: "Add 3D content",
+//           code: `
+// const buildingsLayer = new SceneLayer({ 
+//   portalItem: { id: "73df987984b24094b848d580eb83b0fb" }
+// });
 
+//           `,
+//           before: function(){}
+//         },
         /////////////////////////////////////////////////////////////////////////////////
         //
         //  Step 1: Change symbology
@@ -90,21 +81,21 @@ define([
         {
           title: "Change existing building style",
           code: `
-          buildingsLayer.renderer = {
-            type: 'simple',
-            symbol: {
-              type: 'mesh-3d',
-              symbolLayers: [{
-                type: 'fill',
-                material: {
-                  color: '#FFEEBE'
-                }
-              }]
-            }
-          };
+  buildingsLayer.renderer = {
+    type: 'simple',
+    symbol: {
+      type: 'mesh-3d',
+      symbolLayers: [{
+        type: 'fill',
+        material: {
+          color: '#FFEEBE'
+        }
+      }]
+    }
+  };
           `,
           before: function(){
-            view.map.presentation.slides.getItemAt(1).applyTo(view);
+            //view.map.presentation.slides.getItemAt(1).applyTo(view);
           },
           run:function(){
             const colorRend = renderer = {
