@@ -54,7 +54,7 @@
                 data-separator="^----$"
                 data-separator-vertical="^---$"
                 data-separator-notes="^Note:"
-                data-background="reveal.js/img/bg-5.png" >
+                data-background="reveal.js/img/bg-5.jpg" >
               </section>
       </div>
 
@@ -68,24 +68,24 @@
       // Full list of configuration options available at:
       // https://github.com/hakimel/reveal.js#configuration
       Reveal.initialize({
-        controls: true,
+        controls: false,
         progress: true,
         history: true,
+        slideNumber: false,
         center: false, // don't center vertically - it makes title jump from page to page
-        slideNumber: true,
 
         // The "normal" size of the presentation, aspect ratio will be preserved
                 // when the presentation is scaled to fit different resolutions. Can be
                 // specified using percentage units.
-                width: 1366,
-                height: 768,
+        width: 1366,
+        height: 768,
 
-                // Factor of the display size that should remain empty around the content
-                margin: 0.1,
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
 
-                // Bounds for smallest/largest possible scale to apply to content
-                minScale: 0.2,
-                maxScale: 1.5,
+        // Bounds for smallest/largest possible scale to apply to content
+        minScale: 0.2,
+        maxScale: 1.5,
 
         transition: 'fade', // none/fade/slide/convex/concave/zoom
 
@@ -99,7 +99,6 @@
           { src: 'reveal.js/plugin/notes/notes.js', async: true }
         ]
       });
-      Reveal.configure({ slideNumber: 'c/t' });
 
     </script>
 
