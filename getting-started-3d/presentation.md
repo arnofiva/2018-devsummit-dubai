@@ -1,19 +1,14 @@
-<!-- .slide: data-background="images/bg-8.png" -->
-
-## An Introduction to 3D on the Web
-
+<!-- .slide: data-background="images/bg-1.jpg" -->
+<!-- .slide: class="title" -->
+<br>
+### Getting started with 3D
+### in ArcGIS API for JavaScript
 <br/>
-
-### with ArcGIS API for JavaScript
-
-<br/>
-
-<p>Javier Gutierrez</p>
-<p>Raluca Nicola</p>
+<h4 style="color:#00c467">Javier Gutierrez</h4>
 
 ---
 
-<!-- .slide: data-background="images/bg-3.png" -->
+<!-- .slide: data-background="images/bg-final.jpg" -->
 
 # API concepts
 
@@ -685,7 +680,7 @@ buildingsLayer.renderer = renderer;
 
 ---
 
-<!-- .slide: data-background="./images/bg-8 .png" -->
+<!-- .slide: data-background="./images/bg-final.jpg" -->
 
 # WebScene
 
@@ -749,7 +744,7 @@ https://developers.arcgis.com/web-scene-specification/
 
 ---
 
-<!-- .slide: data-background="./images/bg-8 .png" -->
+<!-- .slide: data-background="./images/bg-final.jpg" -->
 
 # Building an App
 
@@ -1010,7 +1005,7 @@ portal.load().then(function() {
 
 ---
 
-<!-- .slide: data-background="images/bg-3.png" -->
+<!-- .slide: data-background="images/bg-final.jpg" -->
 
 # New features in 4.10
 
@@ -1049,5 +1044,11 @@ portal.load().then(function() {
 ---
 
 <!-- .slide: data-background="./images/bg-final.jpg" -->
+<!-- .slide: class="center" -->
 
-<img src="images/esri-science-logo-white.png" style="margin: 0; background: none; border: 0px; box-shadow: none;"/>
+## Questions?
+
+---
+
+<!-- .slide: data-background="./images/bg-esri.jpg" -->
+
