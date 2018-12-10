@@ -63,24 +63,15 @@ define([
         //  Step 0: Add Scene Layer
         //
         /////////////////////////////////////////////////////////////////////////////////
-        {
-          title: "Add 3D Content",
-          code: `
-          var l = new SceneLayer( 
-            portalItem: {
-              id: "73df987984b24094b848d580eb83b0fb"
-            }
-          );
-          // OR
-          var l = new SceneLayer( 
-            url: "https://..."
-          );
-          `,
-          before: function(){
-          },
-          run:function(){
-          }
-        },
+//         {
+//         title: "Add 3D content",
+//         code: `
+// const buildingsLayer = new SceneLayer({ 
+//   portalItem: { id: "73df987984b24094b848d580eb83b0fb" }
+// });
+//         `,
+//           before: function(){}
+//         },
 
         /////////////////////////////////////////////////////////////////////////////////
         //
@@ -90,21 +81,21 @@ define([
         {
           title: "Change existing building style",
           code: `
-          buildingsLayer.renderer = {
-            type: 'simple',
-            symbol: {
-              type: 'mesh-3d',
-              symbolLayers: [{
-                type: 'fill',
-                material: {
-                  color: '#FFEEBE'
-                }
-              }]
-            }
-          };
+  buildingsLayer.renderer = {
+    type: 'simple',
+    symbol: {
+      type: 'mesh-3d',
+      symbolLayers: [{
+        type: 'fill',
+        material: {
+          color: '#FFEEBE'
+        }
+      }]
+    }
+  };
           `,
           before: function(){
-            view.map.presentation.slides.getItemAt(1).applyTo(view);
+            //view.map.presentation.slides.getItemAt(1).applyTo(view);
           },
           run:function(){
             const colorRend = renderer = {
@@ -136,9 +127,11 @@ define([
           title: "Add project layer",
 
           code: `
-const projectLayer = new SceneLayer("https://...");
-view.map.add(projectLayer);
-`,
+  const projectLayer = new SceneLayer({
+    url: "https://.../ProjectBuilding/SceneServer"
+  });
+  view.map.add(projectLayer);
+          `,
           before: function () {
             view.map.presentation.slides.getItemAt(2).applyTo(view);
           },
@@ -150,7 +143,47 @@ view.map.add(projectLayer);
 
         /////////////////////////////////////////////////////////////////////////////////
         //
-        //  Step 3: Emphasize the planned project
+        //  Step 3: Enable 'Edge Rendering'
+        //
+        /////////////////////////////////////////////////////////////////////////////////
+
+        {
+          title: "Enable Edge Rendering",
+
+          code: `
+  const renderer = projectLayer.renderer.clone();
+  const fillSymbolLayer = renderer.symbol.symbolLayers.getItemAt(0);
+
+  fillSymbolLayer.edges = {
+    type: 'solid',
+    color: "#383838",
+    size: 0.5
+  };
+
+  projectLayer.renderer = renderer;
+          `,
+          before: function () {
+            view.map.presentation.slides.getItemAt(4).applyTo(view);
+          },
+
+          run: function () {
+            const renderer = projectLayer.renderer.clone();
+            const fillSymbolLayer = renderer.symbol.symbolLayers.getItemAt(0);
+
+            fillSymbolLayer.edges = {
+              type: 'solid',
+              color: "#383838",
+              size: 0.5,
+              extensionLength: 0
+            };
+
+            projectLayer.renderer = renderer;
+          }
+        },
+
+        /////////////////////////////////////////////////////////////////////////////////
+        //
+        //  Step 4: Emphasize the planned project
         //
         /////////////////////////////////////////////////////////////////////////////////
 
@@ -158,17 +191,17 @@ view.map.add(projectLayer);
           title: "Emphasize the planned project",
 
           code: `
+  const renderer = projectLayer.renderer.clone();
+  const fillSymbolLayer = renderer.symbol.symbolLayers.getItemAt(0);
 
-const renderer = projectLayer.renderer.clone();
-const fillSymbolLayer = renderer.symbol.symbolLayers.getItemAt(0);
+  fillSymbolLayer.edges = {
+    type: 'sketch',
+    color: "#534026",
+    size: 1.5,
+    extensionLength: 2
+  };
 
-fillSymbolLayer.edges = {
-  type: 'sketch',
-  color: "#534026",
-  size: 1.5
-};
-
-projectLayer.renderer = renderer;
+  projectLayer.renderer = renderer;
 `,
           before: function () {
             view.map.presentation.slides.getItemAt(4).applyTo(view);
@@ -184,10 +217,6 @@ projectLayer.renderer = renderer;
               size: 1.5,
               extensionLength: 2
             };
-
-            fillSymbolLayer.material = {
-              color: "#FFFFFF"
-            }
 
             projectLayer.renderer = renderer;
           }
