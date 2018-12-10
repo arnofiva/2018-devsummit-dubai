@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>CoordinateConversion widget - 4.9</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <script src="demo.js"></script>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .esri-widget {
+            background-color: lightblue;
+        }
+        .esri-coordinate-conversion__display {
+            font-weight: bold;
+        }
+
+        .esri-coordinate-conversion__display {
+            font-size: medium;
+        }
+
+        .esri-coordinate-conversion__select-row {
+            font-size: medium;
+            width: 100px;
+        }
+
+        .esri-coordinate-conversion {
+            width: 500px;
+        }
+    </style>
+    <script src="https://js.arcgis.com/4.9/"></script>
+    <script>
+      require([
+        "esri/views/MapView",
+        "esri/widgets/CoordinateConversion",
+        "esri/Map",
+        "esri/geometry/SpatialReference",
+        "esri/widgets/CoordinateConversion/support/Format",
+        "esri/geometry/Point",
+        "esri/geometry/support/webMercatorUtils",
+      ], function(MapView, CoordinateConversion, Map, SpatialReference, Format, Point, webMercatorUtils) {
+
+        var map = new Map({
+          basemap: "streets-relief-vector"
+        });
+
+        var view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [13.4050, 52.5200],
+          zoom: 17
+        });
+
+        var ccWidget = new CoordinateConversion({
+          view: view
+        });
+
+        view.ui.add(ccWidget, "top-right");
+
+        var numberSearchPattern = /-?\d+[\.]?\d*/;
+
+        let latlongFormat = new Format({
+          name: "EPSG 3035",
+          conversionInfo: {
+            spatialReference: new SpatialReference({
+              wkid: 3035
+            })
+          }
+        });
+
+        // Add our new format to the widget's dropdown
+        ccWidget.formats.add(latlongFormat);
+      });
+    </script>
+</head>
+
+<body class="calcite">
+
+<header class="demo-header">
+    <!--<section class="demo-version">-->
+        <!--<span>4.x</span>-->
+    <!--</section>-->
+    <section class="demo-title">
+        <span>Coordinate Conversion Widget</span>
+        <span class="btn-demo">Code</span>
+    </section>
+</header>
+
+
+<div id="code" class="code right shadowed" style="width: 800px;">
+        <textarea id="codemirror">
+let epsg3035Format = new Format({
+  name: "EPSG 3035",
+  conversionInfo: {
+    spatialReference: new SpatialReference({
+      wkid: 3035
+    })
+  }
+});
+       </textarea>
+</div>
+
+    <div id="viewDiv"></div>
+</body>
+</html>

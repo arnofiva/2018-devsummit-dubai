@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>FeatureLayer Analysis</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+  <link rel="stylesheet" href="css/demo.css">
+  <script src="demo.js"></script>
+
+  <script src="https://js.arcgis.com/4.9/"></script>
+
+  <style>
+    html,
+    body {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    #viewDiv {
+      position: absolute;
+      top: 75px;
+      bottom: 0;
+      width: 100%;
+    }
+
+    #info {
+      padding: 0.5em;
+      font-size: 1.1em;
+    }
+    
+    .big {
+      font-size: 3em;
+    }
+
+    .area-info {
+      color: #ffae00;
+    }
+
+    .pop-info {
+      color: #ff0080;
+    }
+  </style>
+
+
+  <script>
+   require([
+      "esri/WebMap",
+      "esri/views/MapView",
+      "esri/widgets/Legend",
+      "esri/widgets/Sketch/SketchViewModel",
+      "esri/core/watchUtils",
+      "esri/geometry/geometryEngine"
+    ], function(WebMap, MapView, Legend, SketchViewModel, watchUtils, geometryEngine) {
+      const map = new WebMap({
+        portalItem: {
+          id: "52f48e785013425a9baac8bb2829d341"
+        }
+      });
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        highlightOptions: {
+          color: [255, 0, 128, 1],
+          haloOpacity: 0.9,
+          fillOpacity: 0.2
+        }
+      });
+      
+      const sketchViewModel = new SketchViewModel({
+        view: view,
+        layer: view.graphics,
+        pointSymbol: {
+          type: "simple-marker",
+          style: "square",
+          color: "red",
+          size: "16px",
+          outline: {
+            color: [255, 255, 0],
+            width: 3
+          }
+        },
+        polylineSymbol: {
+          type: "simple-line",
+          color: "#8A2BE2",
+          width: "4",
+          style: "dash"
+        },
+        polygonSymbol: {
+          type: "simple-fill",
+          color: "rgba(138,43,226, 0)",
+          style: "solid",
+          outline: {
+            color: "white",
+            width: 1
+          }
+        }
+      });
+      
+      const legend = new Legend({view});
+      
+      view.ui.add("select-by-polygon", "top-left");
+      view.ui.add("info", "top-right");
+      view.ui.add(legend, "bottom-right");
+      const selectButton = document.getElementById("select-by-polygon");
+      const info = document.getElementById("info");
+
+      let handler;
+      selectButton.addEventListener("click", function() {
+        view.popup.close();
+        // ready to draw a polygon
+        sketchViewModel.create("circle");
+        handler = view.on("pointer-move", function(event) {
+          // this polygon will be used to query features that intersect it
+          if (sketchViewModel.graphic) {
+            selectFeatures(sketchViewModel.graphic.geometry);
+          }
+        });
+      });
+      
+      sketchViewModel.on("create-complete", function(event) {
+        // this polygon will be used to query features that intersect it
+        handler.remove();
+        selectFeatures(event.geometry);
+      });
+      
+      const {geodesicArea} = geometryEngine;
+      const sym = {
+        type: "simple-fill",
+        color: "rgba(138,43,226, 0.6)",
+        style: "solid",
+        outline: {
+          color: "white",
+          width: 1
+        }
+      };
+      
+      let highlight;
+      
+      function selectFeatures(geometry) {
+        const layer = map.layers.getItemAt(0);
+        view.whenLayerView(layer).then(layerView => {
+          watchUtils.whenFalseOnce(layerView, "updating", () => {
+            const query = layerView.layer.createQuery();
+            query.geometry = geometry;
+            layerView.queryFeatures(query).then(({features}) => {
+              if (highlight) {
+                highlight.remove();
+              }
+              highlight = layerView.highlight(features);
+              const geoms = features.map(x => x.geometry);
+              const area = geometryEngine.geodesicArea(geometryEngine.union(geoms), "square-kilometers");
+              const totalPop = features.reduce(((a, b) => a + b.attributes.TOTPOP_CY), 0);
+              info.innerHTML = `
+                <p>
+                <span class="pop-info"><span class="big">${totalPop.toLocaleString(undefined, { minimumFractionDigits:0 })}</span> people</span>
+                </p>
+                <p>
+                <span class="area-info"><span class="big">${area.toLocaleString(undefined, { minimumFractionDigits:2 })}</span> sq km</span>
+                </p>
+              `;
+            })
+            .catch(error = console.log(error));
+          });
+        });
+      }
+    });
+
+  </script>
+
+</head>
+
+<body>
+  <header class="demo-header">
+    <section class="demo-title">
+      <span>Client Side Analysis</span>
+      <span class="btn-demo">Code</span>
+    </section>
+  </header>
+
+  <div id="code" class="code right shadowed" style="width: 800px;">
+    <textarea id="codemirror">
+const query = layerView.layer.createQuery();
+query.geometry = geometry;
+layerView.queryFeatures(query).then(({features}) => {
+  if (highlight) {
+    highlight.remove();
+  }
+  // highlight selected features
+  highlight = layerView.highlight(features);
+  const geoms = features.map(x => x.geometry);
+  // calculate the area of the feautures
+  const area = geometryEngine.geodesicArea(
+    geometryEngine.union(geoms), "square-kilometers"
+  );
+  // calculate the total population in the selected area
+  const totalPop = features.reduce(((a, b) => a + b.attributes.TOTPOP_CY), 0);
+  ...
+})
+    </textarea>
+  </div>
+
+  <div id="viewDiv">
+    <div id="select-by-polygon" class="esri-widget esri-widget--button esri-widget esri-interactive" title="Select features by polygon">
+      <span class="esri-icon-radio-unchecked"></span>
+    </div>
+    <div id="info" class="esri-widget esri-component">
+      Select features to display population
+    </div>
+  </div>
+  <script>
+    function highlightCode() {
+      editor.markText(
+        {
+          line: 10, ch: 0
+        }, {
+          line: 13, ch: 0
+        }, {
+          className: "demo-highlight"
+        }
+      );
+    }
+  </script>
+</body>
+
+</html>

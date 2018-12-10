@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+
+    <title>Legend widget no css - 4.9</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+    <link rel="stylesheet" href="css/font-bump.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <script src="demo.js"></script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #viewDiv {
+            position: absolute;
+            top: 75px;
+            right: 0;
+            left: 0;
+            bottom: 0px;
+            margin: 0;
+            padding: 0;
+        }
+        /*div.esri-legend__service {*/
+            /*background-color: #7eaac5;*/
+        /*}*/
+
+        /*.esri-zoom .esri-widget--button {*/
+            /*background:  #7eaac5;*/
+        /*}*/
+
+        /*.esri-legend__layer-table--size-ramp {*/
+            /*background: #ededed;*/
+        /*}*/
+
+        /*.esri-popup__main-container {*/
+            /*background-color: #7eaac5;*/
+        /*}*/
+
+        /*.esri-widget__table tr th {*/
+            /*font-weight: 800;*/
+        /*}*/
+
+        /*.esri-feature__content-element:last-child {*/
+            /*background: #ededed;*/
+        /*}*/
+
+
+    </style>
+
+    <script src="https://js.arcgis.com/4.9/"></script>
+
+    <script>
+      require([
+          "esri/views/MapView",
+          "esri/widgets/Legend",
+          "esri/widgets/Expand",
+          "esri/WebMap"
+        ],
+        function(
+          MapView, Legend, Expand, WebMap
+        ) {
+
+          const webmap = new WebMap({
+            portalItem: { // autocasts as new PortalItem()
+              id: "10f5128431d44f9180d9936834100ac5"
+            }
+          });
+
+          const view = new MapView({
+            container: "viewDiv",
+            map: webmap
+          });
+
+          view.on("mouse-wheel", function(evt){
+            evt.stopPropagation();
+          });
+
+          // add a legend widget instance to the view
+          // and set the style to 'card'. This is a
+          // responsive style, which is good for mobile devices
+
+          // const basicLegend = new Expand({
+          const basicLegend =  new Legend({
+              view: view
+            });
+          view.ui.add(basicLegend, "top-right");
+        });
+    </script>
+</head>
+
+<body>
+
+<header class="demo-header">
+    <!--<section class="demo-version">-->
+        <!--<span>4.x</span>-->
+    <!--</section>-->
+    <section class="demo-title">
+        <span>Widget Styling with SASS</span>
+        <span class="btn-demo">Code</span>
+    </section>
+</header>
+
+
+<div id="code" class="code right shadowed" style="width: 800px;">
+        <textarea id="codemirror">
+// main.scss
+
+$legend_table_size_ramp_background: #ededed;
+$background_color:  #7eaac5;
+$feature_background: #ededed;
+$text_weight_normal: 800;
+
+@import "../base/core";
+       </textarea>
+</div>
+
+
+    <div id="viewDiv"></div>
+</body>
+</html>

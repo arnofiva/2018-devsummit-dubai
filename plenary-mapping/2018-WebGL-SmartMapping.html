@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>WebGL SmartMapping</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+  <link rel="stylesheet" href="css/demo.css">
+  <script src="demo.js"></script>
+
+  <script src="https://js.arcgis.com/4.9/"></script>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+  #applicationDiv {
+    position: absolute;
+    top: 75px;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #viewDiv {
+    width: 100%;
+    height: 100%;
+    flex: 1 1 auto;
+    order: 1;
+  }
+
+  #titleDiv {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.2019rem;
+    padding: 10px;
+  }
+
+  #sliderContainer {
+    flex: 0 0 80px;
+    order: 2;
+
+    display: flex;
+    flex-flow: row;
+
+    padding: 0 12px;
+  }
+
+  #sliderValue {
+    flex: 0 0 100px;
+    order: 1;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+
+    font-size: 300%;
+  }
+
+  #sliderInnerContainer {
+    flex: 1 1 auto;
+    order: 2;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 20px;
+  }
+
+  #sliderLabels {
+    flex: 1 1 auto;
+    order: 1;
+
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  #rangeWrapper {
+    flex: 1 1 auto;
+    order: 2;
+
+    position: relative;
+    padding: 0 20px;
+  }
+
+  #slider {
+    width: 100%;
+  }
+  #title {
+    font-size: 14pt;
+  }
+
+  </style>
+
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/Legend"
+    ], function(
+      EsriMap,
+      MapView,
+      FeatureLayer,
+      Legend
+    ) {
+      
+      const slider = document.getElementById("slider");
+      
+      const layer = new FeatureLayer({
+        portalItem: {
+          id: "ecf431fd8c394ee1b2fd7d54563e7b81"
+        },
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "simple-fill",
+            color: "rgb(0, 0, 0)",
+            outline: null
+          },
+          label: "Buildings",
+          visualVariables: [
+            {
+              type: "opacity",
+              field: "AnzahlDerObergeschosse",
+              stops: [
+                {
+                  opacity: 1,
+                  value: 25
+                },
+                {
+                  opacity: 0,
+                  value: 26
+                }
+              ],
+              legendOptions: {
+                showLegend: false
+              }
+            },
+            {
+              type: "color",
+              field: "AnzahlDerObergeschosse",
+              stops: [
+                {
+                  value: 1,
+                  color: "#0ff",
+                  label: "Single Floor"
+                },
+                {
+                  value: 16,
+                  color: "#f0f",
+                  label: "> 16 Floors"
+                },
+                {
+                  value: 32,
+                  color: "#de2900",
+                  label: "> 32 Floors"
+                }
+              ]
+            }
+          ]
+        }
+      });
+
+      const map = new EsriMap({
+        basemap: "dark-gray-vector",
+        layers: [layer]
+      });
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [13.4, 52.52],
+        scale: 80000
+      });
+
+      view.ui.add("show-image", "top-left");
+
+      const imgbtn = document.getElementById("show-image");
+      let visible = false;
+      const img = new Image();
+      img.src = "img/tiles.png";
+      imgbtn.addEventListener("click", _ => {
+        if (visible) {
+          view.ui.remove(img);
+        }
+        else {
+          view.ui.add(img, "bottom-left");
+        }
+        visible = !visible;
+      });
+
+      const legend = new Legend({ view });
+      view.ui.add(legend, "bottom-right");
+      
+      function inputHandler() {
+        setValue(parseInt(slider.value));
+      }
+      slider.addEventListener("input", inputHandler);
+      slider.addEventListener("change", inputHandler);
+
+      function setValue(value) {
+        sliderValue.innerHTML = Math.floor(value);
+        slider.value = Math.floor(value);
+        layer.renderer = createRenderer(value);
+      }
+      
+      function createRenderer(value) {
+        const opacityStops = [
+          {
+            opacity: 1,
+            value: value
+          },
+          {
+            opacity: 0,
+            value: value + 1
+          }
+        ];
+
+        return {
+          type: "simple",
+          symbol: {
+            type: "simple-fill",
+            color: "rgb(0, 0, 0)",
+            outline: null
+          },
+          label: "Buildings",
+          visualVariables: [
+            {
+              type: "opacity",
+              field: "AnzahlDerObergeschosse",
+              stops: opacityStops,
+              legendOptions: {
+                showLegend: false
+              }
+            },
+            {
+              type: "color",
+              field: "AnzahlDerObergeschosse",
+              stops: [
+                {
+                  value: 1,
+                  color: "#0ff",
+                  label: "Single Floor"
+                },
+                {
+                  value: 16,
+                  color: "#f0f",
+                  label: "> 16 Floors"
+                },
+                {
+                  value: 32,
+                  color: "#de2900",
+                  label: "> 32 Floors"
+                }
+              ]
+            }
+          ]
+        };
+      }
+    });
+
+  </script>
+
+</head>
+
+<body>
+  <header class="demo-header">
+    <section class="demo-title">
+      <span>WebGL SmartMapping</span>
+      <span class="btn-demo">Code</span>
+    </section>
+  </header>
+
+  <div id="code" class="code right shadowed" style="width: 800px;">
+    <textarea id="codemirror">
+// update opacity based on slider values
+function createRenderer(value) {
+  return {
+    type: "simple",
+    ...
+    visualVariables: [
+      {
+        type: "opacity",
+        ...
+        stops: [
+          {
+            opacity: 1,
+            value: value
+          },
+          {
+            opacity: 0,
+            value: value + 1
+          }
+        ]
+      },
+      ...
+    ]
+  };
+}
+    </textarea>
+  </div>
+
+  <div id="applicationDiv">
+    <div id="viewDiv">
+      <div id="show-image" class="esri-widget esri-widget--button esri-widget esri-interactive" title="Show image">
+        <span class="esri-icon-media"></span>
+      </div>
+    </div>
+    <div id="sliderContainer" class="esri-widget">
+      <span id="sliderValue">25</span>
+      <span>Floors</span>
+      <div id="sliderInnerContainer">
+        <div id="sliderLabels">
+          <span>1</span>
+          <span>32</span>
+        </div>
+        <div id="rangeWrapper">
+          <input id="slider" type="range" min="1" max="32" step="1" value="25" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function highlightCode() {
+        editor.markText(
+        {
+            line: 5, ch: 0
+        }, {
+            line: 22, ch: 0
+        }, {
+            className: "demo-highlight"
+        }
+        );
+    }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Heatmap</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+  <link rel="stylesheet" href="css/demo.css">
+  <script src="demo.js"></script>
+
+  <script src="https://js.arcgis.com/4.9/"></script>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #viewDiv {
+      position: absolute;
+      top: 75px;
+      bottom: 0px;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #title {
+      font-size: 14pt;
+    }
+  </style>
+
+
+  <script>
+require([
+  "esri/WebMap",
+  "esri/views/MapView",
+  "esri/widgets/Legend"
+], function(WebMap, MapView, Legend) {
+
+  const map = new WebMap({
+    portalItem: {
+      id: "4b892bd62f514fb7ad24b17163a32eaa"
+    }
+  });
+  const view = new MapView({
+    container: "viewDiv",
+    map: map
+  });
+  
+  const legend = new Legend({view});
+  view.ui.add(legend, "bottom-right");
+});
+  </script>
+
+</head>
+
+<body>
+  <header class="demo-header">
+    <section class="demo-title">
+      <span>Heatmap</span>
+      <span class="btn-demo">Code</span>
+    </section>
+  </header>
+
+  <div id="code" class="code right shadowed" style="width: 800px;">
+    <textarea id="codemirror">
+// Publish online, consume in apps
+const map = new WebMap({
+  portalItem: {
+    id: "4b892bd62f514fb7ad24b17163a32eaa"
+  }
+});
+    </textarea>
+  </div>
+
+  <div id="viewDiv"></div>
+  </div>
+  <script>
+    function highlightCode() {
+      editor.markText(
+        {
+          line: 3, ch: 0
+        }, {
+          line: 4, ch: 0
+        }, {
+          className: "demo-highlight"
+        }
+      );
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Feature Widget - 4.9</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+    <link rel="stylesheet" href="css/demo.css">
+    <script src="demo.js"></script>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.9/"></script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #viewDiv {
+            position: absolute;
+            top: 75px;
+            right: 0;
+            left: 0;
+            bottom: 0px;
+            margin: 0;
+            padding: 0;
+        }
+
+        #side-panel {
+            width: 240px;
+            height: 100%;
+        }
+
+        .esri-feature {
+            letter-spacing: 0em;
+            font-family: "Avenir Next", "Helvetica Neue", sans-serif;
+            line-height: 1.55rem;
+            font-feature-settings: "liga"1, "calt"0;
+            background: #fff;
+            padding: 1em;
+        }
+
+        .esri-feature esri-component {
+            height: 100%;
+        }
+
+    </style>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/layers/FeatureLayer",
+        "esri/views/MapView",
+        "esri/widgets/Feature"
+      ], function(Map, FeatureLayer, MapView, Feature) {
+
+        const fLayer = new FeatureLayer({
+          portalItem: {
+            id: "673e64cb978d4e79ab47f541a7c52d65"
+          }
+        });
+
+        const map = new Map({
+          basemap: "gray-vector",
+          layers: [fLayer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [-80, 40],
+          scale: 5000000
+        });
+
+        view.on("mouse-wheel", function(evt){
+          evt.stopPropagation();
+        });
+
+        view.when().then(function() {
+          // Create a default graphic for when the application starts
+          const graphic = {
+            popupTemplate: {
+              content: "Mouse over features to show details..."
+            }
+          };
+
+          // Provide graphic to a new instance of a Feature widget
+          const feature = new Feature({
+            container: "side-panel",
+            graphic: graphic,
+            view: view
+          });
+
+          view.ui.add(feature, "top-right");
+
+          view.whenLayerView(fLayer).then(function(layerView) {
+            let highlight;
+            // listen for the pointer-move event on the View
+            view.on("pointer-move", function(event) {
+              // Perform a hitTest on the View
+              view.hitTest(event).then(function(event) {
+                // Make sure graphic has a popupTemplate
+                let results = event.results.filter(function(result) {
+                  return result.graphic.layer.popupTemplate;
+                });
+                let result = results[0];
+                highlight && highlight.remove();
+                // Update the graphic of the Feature widget
+                // on pointer-move with the result
+                if (result) {
+                  feature.graphic = result.graphic;
+                  highlight = layerView.highlight(result.graphic);
+                } else {
+                  feature.graphic = graphic;
+                }
+              });
+            });
+          });
+
+        });
+
+      });
+    </script>
+</head>
+
+<body>
+
+
+<header class="demo-header">
+    <!--<section class="demo-version">-->
+        <!--<span>4.x</span>-->
+    <!--</section>-->
+    <section class="demo-title">
+        <span>Feature Widget</span>
+        <span class="btn-demo">Code</span>
+    </section>
+</header>
+
+<div id="code" class="code right shadowed" style="width: 800px;">
+        <textarea id="codemirror">
+const feature = new Feature({
+    container: "side-panel",
+    graphic: graphic,
+    view: view
+});
+       </textarea>
+</div>
+
+<!--
+
+view.hitTest(event).then(function(event) {
+   . . .
+   let results = event.results.filter(function(result) {
+      return result.graphic.layer.popupTemplate;
+   });
+   . . .
+   feature.graphic = results[0].graphic;
+}
+-->
+
+<div id="viewDiv">
+    <div id="side-panel"></div>
+</div>
+</body>
+
+</html>

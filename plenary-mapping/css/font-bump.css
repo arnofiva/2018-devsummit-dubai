@@ -1,0 +1,20 @@
+.esri-layer-list__item-container {
+    font-size: 20px;
+}
+.esri-layer-list-panel__content--legend .esri-legend__service {
+    font-size: 18px;
+}
+.esri-legend__layer-cell--info {
+    font-size: 16px;
+}
+.esri-legend--card__section {
+    font-size: 16px;
+}
+
+.esri-feature__content-element {
+    font-size: 14px;
+}
+
+.esri-widget__table tr th {
+    font-size: 14px;
+}
