@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+
+    <title>LayerList - 4.9</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/themes/light-blue/main.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <link rel="stylesheet" href="css/font-bump.css">
+    <script src="demo.js"></script>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+    </style>
+
+    <script src="https://js.arcgis.com/4.9/"></script>
+
+    <script>
+      require([
+        "esri/WebMap",
+        "esri/views/MapView",
+        "esri/widgets/LayerList"
+      ], function(
+        WebMap, MapView, LayerList
+      ) {
+
+        const map = new WebMap({
+          portalItem: {
+            id: "d5dda743788a4b0688fe48f43ae7beb9"
+          }
+        });
+
+        // Add the map to a MapView
+        const view = new MapView({
+          container: "viewDiv",
+          map: map
+        });
+
+        // Add a legend instance to the panel of a
+        // ListItem in a LayerList instance
+        const layerList = new LayerList({
+          view: view,
+          listItemCreatedFunction: function(event) {
+            const item = event.item;
+            if (item.layer.type !== "group") { // don't show legend twice
+              item.panel = {
+                content: "legend",
+                open: false
+              };
+            }
+          }
+        });
+        view.ui.add(layerList, "top-right");
+
+      });
+    </script>
+
+</head>
+
+<body>
+
+<header class="demo-header">
+    <!--<section class="demo-version">-->
+        <!--<span>4.x</span>-->
+    <!--</section>-->
+    <section class="demo-title">
+        <span>LayerList Widget</span>
+        <span class="btn-demo">Code</span>
+    </section>
+</header>
+
+
+    <div id="code" class="code right shadowed" style="width: 800px;">
+        <textarea id="codemirror">
+const layerList = new LayerList({
+  view: view,
+  listItemCreatedFunction: function(event) {
+    const item = event.item;
+    if (item.layer.type !== "group") {
+      item.panel = {
+        content: "legend"
+      };
+    }
+  }
+});
+       </textarea>
+    </div>
+
+<div id="viewDiv"></div>
+<script>
+  function highlightCode() {
+    editor.markText(
+      {
+        line: 5, ch: 0
+      }, {
+        line: 8, ch: 0
+      }, {
+        className: "demo-highlight"
+      }
+    );
+  }
+</script>
+</body>
+
+</html>

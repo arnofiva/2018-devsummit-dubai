@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+
+    <title>Legend widget card style - 4.9</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <script src="demo.js"></script>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        div.esri-legend--card__service-caption-container, div.esri-widget--button {
+            background: #5BC85B;
+        }
+
+        .esri-zoom .esri-widget--button {
+            background: #5BC85B;
+        }
+    </style>
+
+    <script src="https://js.arcgis.com/4.9/"></script>
+
+    <script>
+      require([
+          "esri/views/MapView",
+          "esri/widgets/Legend",
+          "esri/widgets/Expand",
+          "esri/WebMap"
+        ],
+        function(
+          MapView, Legend, Expand, WebMap
+        ) {
+
+          const webmap = new WebMap({
+            portalItem: { // autocasts as new PortalItem()
+              id: "10f5128431d44f9180d9936834100ac5"
+            }
+          });
+
+          const view = new MapView({
+            container: "viewDiv",
+            map: webmap
+          });
+
+          // add a legend widget instance to the view
+          // and set the style to 'card'. This is a
+          // responsive style, which is good for mobile devices
+
+          const legend = new Expand({
+            content: new Legend({
+              view: view,
+              style: {
+                type: "card",
+                layout: "auto"
+              }
+            }),
+            view: view,
+            expanded: true
+          });
+          view.ui.add(legend, "top-right");
+
+        });
+    </script>
+</head>
+
+<body>
+
+<header class="demo-header">
+    <!--<section class="demo-version">-->
+        <!--<span>4.x</span>-->
+    <!--</section>-->
+    <section class="demo-title">
+        <span>Legend Card Style + CSS</span>
+        <span class="btn-demo">Code</span>
+    </section>
+</header>
+
+
+<div id="code" class="code right shadowed" style="width: 800px;">
+        <textarea id="codemirror">
+//  SASS
+$text_color                 : #fff;
+$background_color           : #5BC85B;
+$anchor_color               : #5BC85B;
+$anchor_hover_color         : #000;
+$button_text_color          : #fff;
+$button_text_hover_color    : #000;
+
+// Local override
+div.esri-legend--card__service-caption-container {
+    background: #5BC85B;
+}
+       </textarea>
+</div>
+
+
+    <div id="viewDiv"></div>
+</body>
+</html>

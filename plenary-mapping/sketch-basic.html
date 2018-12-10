@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Sketch temporary geometries - 4.9</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <script src="demo.js"></script>
+    <script src="https://js.arcgis.com/4.9/"></script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #viewDiv {
+            position: absolute;
+            top: 75px;
+            right: 0;
+            left: 0;
+            bottom: 0px;
+            margin: 0;
+            padding: 0;
+        }
+
+        #topbar {
+            background: #fff;
+            /*position: absolute;*/
+            /*top: 15px;*/
+            /*right: 15px;*/
+            /*padding: 10px;*/
+        }
+
+        #dropdown {
+            padding: 1em;
+            text-align: center;
+        }
+
+        .action-button {
+            font-size: 24px;
+            background-color: transparent;
+            border: 1px solid #D3D3D3;
+            color: #6e6e6e;
+            height: 60px;
+            width: 60px;
+            text-align: center;
+            box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-button:hover,
+        .action-button:focus {
+            background: #0079c1;
+            color: #e4e4e4;
+        }
+
+        .active {
+            background: #0079c1;
+            color: #e4e4e4;
+        }
+
+        /* Dropdown Button */
+        .dropbtn {
+            background-color: #3498DB;
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Dropdown button on hover & focus */
+        .dropbtn:hover, .dropbtn:focus {
+            background-color: #2980B9;
+        }
+
+        /* The container <div> - needed to position the dropdown content */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Dropdown Content (Hidden by Default) */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            padding-right: 50px;
+            background-color: #f1f1f1;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* Links inside the dropdown */
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* Change color of dropdown links on hover */
+        .dropdown-content a:hover {
+            background-color: #ddd
+        }
+
+        /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+        .show {
+            display: block;
+        }
+
+    </style>
+
+    <script>
+
+        let _maxArea = 0;
+
+      require([
+        "esri/views/MapView",
+        "esri/Map",
+        "esri/widgets/Sketch/SketchViewModel",
+        "esri/Graphic",
+        "esri/layers/GraphicsLayer",
+        "esri/geometry/geometryEngine",
+        "esri/geometry/Polyline"
+      ], function (
+        MapView, Map,
+        SketchViewModel, Graphic, GraphicsLayer, geometryEngine, Polyline
+      ) {
+
+        let editGraphic;
+        let pointLocation;
+
+
+        const errorSymbolRed = {
+          type: "simple-fill", // autocasts as SimpleFillSymbol
+          color: [255, 0, 0, 0.5],
+          style: "solid",
+          opacity: 0.5,
+          outline: {  // autocasts as SimpleLineSymbol
+            color: [255, 255, 0, 1],
+            width: 2,
+            style: "dash"
+          }
+        };
+
+        const errorSymbolYellow = {
+          type: "simple-fill", // autocasts as SimpleFillSymbol
+          color: [255, 255, 0, 0.5],
+          style: "solid",
+          opacity: 0.5,
+          outline: {  // autocasts as SimpleLineSymbol
+            color: [255, 0, 0, 1],
+            width: 2,
+            style: "dash"
+          }
+        };
+
+
+        // GraphicsLayer to hold graphics created via sketch view model
+        const graphicsLayer = new GraphicsLayer({
+          id: "tempGraphics"
+        });
+
+        const map = new Map({
+          basemap: "streets",
+          layers: [graphicsLayer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 16,
+          center: [13.4050, 52.5200]
+        });
+
+        const polygonSymbol = {
+          type: "simple-fill", // autocasts as new SimpleFillSymbol()
+          color: "rgba(138,43,226, 0.8)",
+          style: "solid",
+          outline: {
+            color: "white",
+            width: 1
+          }
+        };
+
+        const selectVertexSymbol = {
+          type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+          style: "square",
+          color: "blue",
+          size: "8px",  // pixels
+          outline: {  // autocasts as new SimpleLineSymbol()
+            color: [ 255, 255, 0 ],
+            width: 3  // points
+          }
+        };
+
+        view.on("mouse-wheel", function(evt){
+          evt.stopPropagation();
+        });
+
+        view.when(function () {
+          // create a new sketch view model
+          const sketchViewModel = new SketchViewModel({
+            view,
+            layer: graphicsLayer,
+            polygonSymbol
+          });
+
+          setUpClickHandler();
+
+          // Listen to create-complete event to add a newly created graphic to view
+          sketchViewModel.on("create-complete", addGraphic);
+
+          // Listen the sketchViewModel's update-complete and update-cancel events
+          sketchViewModel.on("update-complete", updateGraphic);
+          sketchViewModel.on("update-cancel", updateGraphic);
+          sketchViewModel.on("reshape", validateGraphic);
+          sketchViewModel.on("scale", validateGraphic);
+          sketchViewModel.on("create", setSymbol);
+
+          // view.on("pointer-move", (evt)=>{
+          //
+          //   pointLocation = view.toMap({
+          //     x: evt.x,
+          //     y: evt.y
+          //   });
+          //
+          //   if(sketchViewModel.graphic != null){
+          //     const vertex  = geometryEngine.nearestVertex(sketchViewModel.graphic.geometry, pointLocation);
+          //     console.log("vertex ", vertex);
+          //
+          //   }
+          // });
+
+          let originalSymbol = null;
+
+          function setSymbol(event) {
+            originalSymbol = event.target.graphic.symbol.clone();
+          }
+
+          // called when sketchViewModel's create-complete event is fired.
+          function addGraphic(event) {
+            // Create a new graphic and set its geometry to
+            // `create-complete` event geometry.
+            const graphic = new Graphic({
+              geometry: event.geometry,
+              symbol: sketchViewModel.graphic.symbol
+            });
+            graphicsLayer.add(graphic);
+          }
+
+          function validateGraphic(event){
+            const area = geometryEngine.geodesicArea(event.geometry.clone(), "square-meters");
+            console.log("validate graphic: ", event);
+            console.log("symbol ", originalSymbol);
+
+            if(area >= 100000 && _maxArea === 100){
+              console.log("area ", area);
+                event.target.graphic.symbol = errorSymbolRed;
+            }
+            else if(area < 100000 && _maxArea === 100) {
+              console.log("reset symbol");
+              event.target.graphic.symbol = originalSymbol;
+            }
+
+            if(area >= 200000 && _maxArea === 200){
+              event.target.graphic.symbol = errorSymbolYellow;
+            }
+
+            else if(area < 200000 && _maxArea === 200) {
+              console.log("reset symbol");
+              event.target.graphic.symbol = originalSymbol;
+            }
+
+            console.log(area);
+          }
+
+          // Runs when sketchViewModel's update-complete or update-cancel
+          // events are fired.
+          function updateGraphic(event) {
+            // Create a new graphic and set its geometry event.geometry
+            var graphic = new Graphic({
+              geometry: event.geometry,
+              symbol: editGraphic.symbol
+            });
+            graphicsLayer.add(graphic);
+
+            // set the editGraphic to null update is complete or cancelled.
+            editGraphic = null;
+          }
+
+          // set up logic to handle geometry update and reflect the update on "graphicsLayer"
+          function setUpClickHandler() {
+            view.on("click", function (event) {
+              view.hitTest(event).then(function (response) {
+                var results = response.results;
+                if (results.length > 0) {
+                  for (var i = 0; i < results.length; i++) {
+                    // Check if we're already editing a graphic
+                    if (!editGraphic && results[i].graphic.layer.id === "tempGraphics") {
+                      // Save a reference to the graphic we intend to update
+                      editGraphic = results[i].graphic;
+
+                      // Remove the graphic from the GraphicsLayer
+                      // Sketch will handle displaying the graphic while being updated
+                      graphicsLayer.remove(editGraphic);
+                      sketchViewModel.update(editGraphic);
+                      break;
+                    }
+                  }
+                }
+              });
+            });
+          }
+
+          // activate the sketch to create a polygon
+          let drawPolygonButton = document.getElementById("polygonButton");
+          drawPolygonButton.onclick = function () {
+            // set the sketch to create a polygon geometry
+            sketchViewModel.create("polygon");
+            setActiveButton(this);
+          };
+
+          document.getElementById("undoButton").onclick = function () {
+            sketchViewModel.undo();
+            setActiveButton();
+          };
+
+          document.getElementById("redoButton").onclick = function () {
+            sketchViewModel.redo();
+            setActiveButton();
+          };
+
+          // reset button
+          document.getElementById("resetBtn").onclick = function () {
+            sketchViewModel.reset();
+            graphicsLayer.removeAll();
+            setActiveButton();
+          };
+
+          function setActiveButton(selectedButton) {
+            // focus the view to activate keyboard shortcuts for sketching
+            view.focus();
+            var elements = document.getElementsByClassName("active");
+            for (var i = 0; i < elements.length; i++) {
+              elements[i].classList.remove("active");
+            }
+            if (selectedButton) {
+              selectedButton.classList.add("active");
+            }
+          }
+        });
+
+        view.ui.add("topbar", "top-right");
+        view.ui.add("dropdown", "top-right");
+
+      });
+
+
+      /* When the user clicks on the button,
+    toggle between hiding and showing the dropdown content */
+      function toggle() {
+        // document.getElementById("myDropdown").classList.toggle("show");
+        let btn = document.getElementById("btn-dropdown")
+        btn.style.background = "yellow";
+        btn.style.color = "black";
+        maxAreaTwo();
+      }
+
+      function maxAreaOne(){
+        document.getElementById("btn-dropdown").innerText = "100k m/sq";
+        _maxArea = 100;
+      }
+
+      function maxAreaTwo(){
+        // document.getElementById("btn-dropdown").innerHTML = "Restrict Area To:<br/> 200k m/sq";
+        _maxArea = 200;
+      }
+
+      // Close the dropdown menu if the user clicks outside of it
+      window.onclick = function (event) {
+        if (!event.target.matches('.dropbtn')) {
+
+          let dropdowns = document.getElementsByClassName("dropdown-content");
+          let i;
+          for (i = 0; i < dropdowns.length; i++) {
+            let openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+              openDropdown.classList.remove('show');
+            }
+          }
+        }
+      }
+
+
+    </script>
+</head>
+
+<body>
+
+<header class="demo-header">
+    <section class="demo-title">
+        <span>Sketch + Geometry Engine</span>
+        <span class="btn-demo">Code</span>
+    </section>
+</header>
+
+
+<div id="code" class="code right shadowed" style="width: 800px;">
+        <textarea id="codemirror">
+sketchViewModel.on("reshape", function(event) {
+   const area =
+      geometryEngine.geodesicArea(
+         event.geometry.clone(),
+         "square-meters");
+
+   if(area >= 200000){
+      event.target.graphic.symbol = symbolYellow;
+   }
+)};
+       </textarea>
+</div>
+
+<div id="viewDiv">
+    <div id="topbar">
+        <button class="action-button esri-icon-polygon" id="polygonButton" type="button"
+                title="Draw polygon"></button>
+
+        <button class="action-button esri-icon-left-arrow-circled" id="undoButton" type="button"
+                title="Undo"></button>
+        <button class="action-button esri-icon-right-arrow-circled" id="redoButton" type="button"
+                title="Redo"></button>
+        <button class="action-button esri-icon-trash" id="resetBtn" type="button"
+                title="Clear graphics"></button>
+    </div>
+
+</div>
+
+<div id="dropdown" class="esri-widget">
+    <button id="btn-dropdown" onclick="toggle()" class="dropbtn">Set Area Restriction</button>
+    <div id="myDropdown" class="dropdown-content">
+        <a href="#" onclick="maxAreaOne()">100k m/sq</a>
+        <a href="#" onclick="maxAreaTwo()">200K m/sq</a>
+    </div>
+</div>
+</body>
+
+</html>

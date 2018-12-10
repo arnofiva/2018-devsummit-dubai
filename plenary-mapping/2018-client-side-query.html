@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Client Side Queries</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+  <link rel="stylesheet" href="css/demo.css">
+  <script src="demo.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+  <script src="https://js.arcgis.com/4.9/"></script>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #viewDiv {
+      position: absolute;
+      top: 75px;
+      right: 40%;
+      left: 0;
+      bottom: 0px;
+      margin: 0;
+      padding: 0;
+    }
+
+    #panel {
+      position: absolute;
+      top: 75px;
+      right: 0;
+      bottom: 0;
+      width: 40%;
+      overflow: scroll;
+      background: #efefef;
+    }
+
+    #infoDiv {
+      top: 75px;
+      right: 0px;
+      position: absolute;
+      z-index: 2;
+      opacity: 0.9;
+      background-color: whitesmoke;
+      padding: 8px;
+      font-family: Avenir, Verdana, Geneva, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+    }
+
+    #containerDiv {
+      background-color: white;
+      padding: 3px;
+      text-align: center;
+      font-family: Avenir, Verdana, Geneva, Arial, Helvetica, sans-serif;
+    }
+
+    #title {
+      font-size: 14pt;
+    }
+  </style>
+
+
+  <script>
+    require([
+      "esri/WebMap",
+      "esri/views/MapView",
+      "esri/widgets/Sketch/SketchViewModel",
+      "esri/core/watchUtils",
+      "esri/geometry/geometryEngine"
+    ], function (WebMap, MapView, SketchViewModel, watchUtils, geomEngine) {
+
+    const ctx = document.getElementById("energy-chart").getContext("2d");
+
+    const webmap = new WebMap({
+      portalItem: {
+        id: "878abf89a760405dadb935ac69829448"
+      }
+    });
+
+    const view = new MapView({
+      container: "viewDiv",
+      map: webmap,
+      center: [13.4, 52.52],
+      scale: 80000000,
+      highlightOptions: {
+        color: "black",
+        haloOpacity: 0.65,
+        fillOpacity: 0.45
+      }
+    });
+
+    view.ui.add("select-by-polygon", "top-left");
+    const selectButton = document.getElementById("select-by-polygon");
+    const sketchViewModel = new SketchViewModel({
+        view: view,
+        layer: view.graphics,
+        pointSymbol: {
+          type: "simple-marker",
+          style: "square",
+          color: "red",
+          size: "16px",
+          outline: {
+            color: [255, 255, 0],
+            width: 3
+          }
+        },
+        polylineSymbol: {
+          type: "simple-line",
+          color: "#8A2BE2",
+          width: "4",
+          style: "dash"
+        },
+        polygonSymbol: {
+          type: "simple-fill",
+          color: "rgba(138,43,226, 0)",
+          style: "solid",
+          outline: {
+            color: "white",
+            width: 1
+          }
+        }
+      });
+    const statDefinitions = [
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Biomass' THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Biomass_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Coal'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Coal_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Gas'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Gas_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Hydro'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Hydro_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Nuclear'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Nuclear_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Oil'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Oil_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Solar'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Solar_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Waste'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Waste_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Wind'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Wind_AvgCapacity",
+        statisticType: "avg"
+      },
+      {
+        onStatisticField: "CASE WHEN fuel1 = 'Other'  THEN capacity_mw ELSE 0 END",
+        outStatisticFieldName: "Other_AvgCapacity",
+        statisticType: "avg"
+      }
+    ];
+
+    const chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: [
+          "Biomass",
+          "Coal",
+          "Gas",
+          "Hydro",
+          "Nuclear",
+          "Oil",
+          "Solar",
+          "Waste",
+          "Wind",
+          "Other"
+        ],
+        datasets: [{
+          backgroundColor: ["#ff5bc6", "#ff9aae", "#d398ff", "#5cb9ff", "#6dbf5c", "#ffd7c4", "#ffffc1", "#fe8e5b", "#9ade6f", "#B4CFE4"],
+          borderColor: "rgb(255, 255, 255)",
+          borderWidth: 0,
+          data: [0,0,0,0,0,0,0,0,0,0]
+        }]
+      },
+      options: {
+        responsive: false,
+        cutoutPercentage: 35,
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: "Avg. Power Plant Capacity"
+        }
+      }
+    });
+    
+    let highlightHandle;
+
+    view.when().then(() => {
+      const layer = webmap.layers.getItemAt(0);
+      view.whenLayerView(layer).then(layerView => {
+        let handler;
+        selectButton.addEventListener("click", function() {
+          view.popup.close();
+          // ready to draw a polygon
+          sketchViewModel.create("circle");
+          handler = view.on("pointer-move", function(event) {
+            // this polygon will be used to query features that intersect it
+            if (sketchViewModel.graphic) {
+              selectFeatures(sketchViewModel.graphic.geometry);
+            }
+          });
+        });
+
+        function selectFeatures(geometry) {
+          const query = layerView.layer.createQuery();
+          query.geometry = geometry;
+          query.units = "kilometers";
+          query.outStatistics = statDefinitions;
+          layerView.queryFeatures(query).then(response => {
+            const results = response.features[0];
+
+            const values = [
+              results.attributes.Biomass_AvgCapacity,
+              results.attributes.Coal_AvgCapacity,
+              results.attributes.Gas_AvgCapacity,
+              results.attributes.Hydro_AvgCapacity,
+              results.attributes.Nuclear_AvgCapacity,
+              results.attributes.Oil_AvgCapacity,
+              results.attributes.Solar_AvgCapacity,
+              results.attributes.Waste_AvgCapacity,
+              results.attributes.Wind_AvgCapacity,
+              results.attributes.Other_AvgCapacity
+            ];
+            chart.data.datasets[0].data = values;
+            chart.update();
+          });
+          layerView.queryObjectIds(query).then(ids => {
+            if (highlightHandle) {
+              highlightHandle.remove();
+              highlightHandle = null;
+            }
+
+            highlightHandle = layerView.highlight(ids);
+          });
+        }
+      });
+    });
+  });
+  </script>
+
+</head>
+
+<body>
+  <header class="demo-header">
+    <!-- <section class="demo-version">
+      <span>4.x</span>
+    </section> -->
+    <section class="demo-title">
+      <span>Client Side Queries</span>
+      <span class="btn-demo">Code</span>
+    </section>
+  </header>
+
+  <div id="code" class="code right shadowed" style="width: 800px;">
+    <textarea id="codemirror">
+function selectFeatures(geometry) {
+  const query = layerView.layer.createQuery();
+  query.geometry = geometry;
+  query.units = "kilometers";
+  // statistics done locally
+  query.outStatistics = statDefinitions;
+  layerView.queryFeatures(query).then(response => {
+    // update chart with results
+  });
+}
+    </textarea>
+  </div>
+
+  <div id="viewDiv">
+    <div id="select-by-polygon" class="esri-widget esri-widget--button esri-widget esri-interactive" title="Select features by polygon">
+      <span class="esri-icon-radio-unchecked"></span>
+    </div>
+  </div>
+  <div id="panel">
+    <div style="padding: 15px;">
+      <canvas id="energy-chart" width="700" height="700" style="float:left;"></canvas>
+    </div>
+  </div>
+  <script>
+      function highlightCode() {
+        editor.markText(
+          {
+            line: 4, ch: 0
+          }, {
+            line: 9, ch: 0
+          }, {
+            className: "demo-highlight"
+          }
+        );
+      }
+    </script>
+</body>
+
+</html>

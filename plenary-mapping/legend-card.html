@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+
+    <title>Legend widget card style - 4.9</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/theme/mdn-like.min.css">
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+    <link rel="stylesheet" href="css/font-bump.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <script src="demo.js"></script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #viewDiv {
+            position: absolute;
+            top: 75px;
+            right: 0;
+            left: 0;
+            bottom: 0px;
+            margin: 0;
+            padding: 0;
+        }
+
+        div.esri-legend--card__service-caption-container {
+            background:  #7eaac5;
+        }
+    </style>
+
+    <script src="https://js.arcgis.com/4.9/"></script>
+
+    <script>
+      require([
+          "esri/views/MapView",
+          "esri/widgets/Legend",
+          "esri/widgets/Expand",
+          "esri/WebMap"
+        ],
+        function(
+          MapView, Legend, Expand, WebMap
+        ) {
+
+          const webmap = new WebMap({
+            portalItem: { // autocasts as new PortalItem()
+              id: "10f5128431d44f9180d9936834100ac5"
+            }
+          });
+
+          const view = new MapView({
+            container: "viewDiv",
+            map: webmap,
+            dockOptions: {
+              position: "top-right"
+            }
+          });
+
+          view.on("mouse-wheel", function(evt){
+            evt.stopPropagation();
+          });
+
+          // add a legend widget instance to the view
+          // and set the style to 'card'. This is a
+          // responsive style, which is good for mobile devices
+
+          // const basicLegend = new Expand({
+          //   content: new Legend({
+          //     view: view
+          //   }),
+          //   view: view,
+          //   expanded: true
+          // });
+          // view.ui.add(basicLegend, "top-right");
+
+
+          // const legend = new Expand({
+            const legend = new Legend({
+              view: view,
+              style: {
+                type: "card",
+                layout: "auto"
+              }
+            })
+            // view: view,
+            // expanded: false
+          // });
+          view.ui.add(legend, "bottom-left");
+
+        });
+    </script>
+</head>
+
+<body>
+
+<header class="demo-header">
+    <!--<section class="demo-version">-->
+        <!--<span>4.x</span>-->
+    <!--</section>-->
+    <section class="demo-title">
+        <span>Card Style Legend</span>
+        <span class="btn-demo">Code</span>
+    </section>
+</header>
+
+
+<div id="code" class="code right shadowed" style="width: 800px;">
+        <textarea id="codemirror">
+const legend = new Legend({
+  view: view,
+  style: {
+    type: "card",
+    layout: "auto"
+  }
+});
+       </textarea>
+</div>
+
+
+    <div id="viewDiv"></div>
+</body>
+</html>
