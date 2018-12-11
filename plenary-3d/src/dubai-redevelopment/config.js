@@ -88,7 +88,7 @@ define([
       symbolLayers: [{
         type: 'fill',
         material: {
-          color: '#FFEEBE'
+          color: '#efe7d0'
         }
       }]
     }
@@ -105,7 +105,7 @@ define([
                 symbolLayers: [{
                   type: 'fill',
                   material: {
-                    color: '#FFEEBE'
+                    color: '#efe7d0'
                   }
                 }]
               }
@@ -161,6 +161,7 @@ define([
   };
 
   projectLayer.renderer = renderer;
+  buildingsLayer.renderer = renderer;
           `,
           before: function () {
             view.map.presentation.slides.getItemAt(4).applyTo(view);
@@ -178,6 +179,19 @@ define([
             };
 
             projectLayer.renderer = renderer;
+
+            const renderer2 = buildingsLayer.renderer.clone();
+            const fillSymbolLayer2 = renderer2.symbol.symbolLayers.getItemAt(0);
+
+            fillSymbolLayer2.edges = {
+              type: 'solid',
+              color: "#383838",
+              size: 0.5,
+              extensionLength: 0
+            };
+            
+            buildingsLayer.renderer = renderer2;
+            contextLayer.renderer = renderer2;
           }
         },
 
