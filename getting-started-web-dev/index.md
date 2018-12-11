@@ -315,40 +315,6 @@ var featurelayer = new FeatureLayer({
 
 ----
 
-### **Filtering data**
-
-- FeatureLayer definition expressions
-  - Where clause filters features on the client
-  - Use with large datasets
-- FeatureLayer <a href="https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html#querying" target="_blank">queries</a>
-<br/>
-<br/>
-
-<pre style="display:inline-block; padding: 5px; margin: 10px auto; width: 75%;"><code data-trim>
-var select = dom.byId("selectState");
-on(select, "change", function(e) {
-  var featureId = select.value;
-  var expr = select.value === "" ? "" : "FID = '" + featureId + "'";
-  privateSchoolsPoly.definitionExpression = expr;
-</code></pre>
-<pre style="display:inline-block; padding: 5px; margin: 10px auto; width: 75%;"><code data-trim>
-privateSchoolsPoly.queryFeatures().then(function(results) {
-  results.features.forEach(function(feature) {
-    var featureId = feature.attributes.FID;
-    ...
-</code></pre>
-
-----
-
-### **Demo: Filter features within a layer**
-
-<a href="Demos/Step5_LayerFilter/" target="_blank">
-  <img style="float: center;" src="Images/Step5_Demo.png">
-</a>
-
-
-----
-
 ### **Using web maps**
 <br/>
 - Reduces coding effort<br/>
@@ -366,8 +332,8 @@ var map = new WebMap({
 
 ### **Demo: Add a web map to an application**
 <br/>
-<a href="Demos/Step6_Webmap/" target="_blank">
-  <img style="float: center;" src="Images/Step6_Demo.png">
+<a href="Demos/Step5_Webmap/" target="_blank">
+  <img style="float: center;" src="Images/Step5_Demo.png">
 </a>
 
 ----
@@ -412,8 +378,8 @@ view.ui.add(searchWidget, "top-right");
 
 ### **Demo: Add widgets to the application**
 <br/>
-<a href="Demos/Step7_Widgets/" target="_blank">
-  <img style="float: center;" src="Images/Step7_Demo.png">
+<a href="Demos/Step6_Widgets/" target="_blank">
+  <img style="float: center;" src="Images/Step6_Demo.png">
 </a>
 
 ----
