@@ -83,6 +83,9 @@
       buildingLayer.allSublayers.forEach(function(layer) {
         // modelName is standard accross all BuildingSceneLayer,
         // use it to identify a certain layer
+        if(layer.title === "Roofs"){
+          layer.visible = true;
+        }
         switch (layer.modelName) {
           // Because of performance reasons, the Full Model view is
           // by default set to false. In this scene the Full Model should be visible.
