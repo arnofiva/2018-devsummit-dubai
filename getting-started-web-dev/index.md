@@ -345,6 +345,7 @@ var map = new WebMap({
 <pre style="display:inline-block; padding: 5px; margin: 10px auto; width: 99%;"><code data-trim>
 view.when(function){
     var featurelayer = map.layers.getItemAt(1);
+    
     // 1. Create the widget
     var legend = new Legend({
       // 2. Specify properties for widget
@@ -353,7 +354,8 @@ view.when(function){
           layer: featurelayer,
           title: "Name"
       }]
-  });
+    });
+    
     // 3. Add widget to the view UI
     view.ui.add(legend, "bottom-left");
 });
