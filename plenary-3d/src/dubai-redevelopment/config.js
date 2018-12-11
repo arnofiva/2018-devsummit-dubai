@@ -173,7 +173,7 @@ define([
 
             fillSymbolLayer.edges = {
               type: 'solid',
-              color: "#383838",
+              color: [56,56,56,0.7],
               size: 0.5,
               extensionLength: 0
             };
@@ -185,7 +185,7 @@ define([
 
             fillSymbolLayer2.edges = {
               type: 'solid',
-              color: "#383838",
+              color: [56,56,56,0.5],              
               size: 0.5,
               extensionLength: 0
             };
