@@ -88,7 +88,7 @@ define([
       symbolLayers: [{
         type: 'fill',
         material: {
-          color: '#FFEEBE'
+          color: '#efe7d0'
         }
       }]
     }
@@ -105,7 +105,7 @@ define([
                 symbolLayers: [{
                   type: 'fill',
                   material: {
-                    color: '#FFEEBE'
+                    color: '#efe7d0'
                   }
                 }]
               }
