@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Slice widget - Geological Data - 4.10</title>
+
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .action-button {
+            font-size: 1.2em;
+            font-family: sans-serif;
+            background-color: white;
+            border: 1px solid #D3D3D3;
+            padding: 0.5em;
+            color: #0079c1;
+            text-align: center;
+            box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+
+        .action-button:hover,
+        .action-button:focus,
+        .active {
+            background: #0079c1;
+            color: white;
+        }
+
+        #menu {
+            padding: 0.8em;
+        }
+    </style>
+
+    <link href="https://jsdev.arcgis.com/4.10/esri/css/main.css" rel="stylesheet" type="text/css">
+    <script src="https://jsdev.arcgis.com/4.10/"></script>
+
+    <script>
+        require([
+    "esri/WebScene",
+    "esri/views/SceneView",
+    "esri/widgets/Slice",
+    "esri/core/Collection"
+  ], function(WebScene, SceneView, Slice, Collection) {
+
+    // Load webscene and display it in a SceneView
+    const webscene = new WebScene({
+      portalItem: {
+        id: "afbc660e7e6d4aa9876c40e3bd3ce5ec"
+      }
+    });
+
+    const view = new SceneView({
+      container: "viewDiv",
+      map: webscene
+    });
+
+    window.view = view;
+   
+    const excludedLayers = [];
+    let doorsLayer;
+
+    view.when(function() {
+        
+        view.goTo({"position":{"spatialReference":{"latestWkid":28992,"wkid":28992},"x":144628.65747504914,"y":451517.07288438873,"z":3188.0691612722785},"heading":304.9749270202361,"tilt":71.212387413941});
+    
+        view.map.layers.forEach(l => {
+            if (l.renderer != null && l.renderer.symbol != null){
+            l.elevationInfo = {
+                mode: "absolute-height",
+                offset: -120
+            };
+
+            var r = l.renderer.clone();
+            var sl = r.symbol.symbolLayers.getItemAt(0);
+            sl.edges = {
+                "type":"solid",
+                "color":[0,0,0],
+                "transparency":35,
+                "size":0.3
+            };
+            l.renderer = r;
+            }
+        });
+
+      const sliceButton = document.getElementById("slice");
+      view.ui.add(sliceButton, "top-right");
+      let sliceWidget = null;
+
+      sliceButton.addEventListener("click", function() {
+
+        if (sliceWidget) {
+          sliceWidget.destroy();
+          sliceWidget = null;
+          sliceButton.classList.remove("active");
+        }
+        else {
+          sliceWidget = new Slice({
+            view: view
+          });
+          sliceWidget.viewModel.newSlice();
+          // programmatically add layers that should be excluded from slicing
+          sliceWidget.viewModel.excludedLayers.addMany(excludedLayers);
+          view.ui.add(sliceWidget, "top-right");
+          sliceButton.classList.add("active");
+        }
+      });
+    }).catch(e => console.error (e));
+
+    view.ui.empty("top-left");
+
+});
+
+  </script>
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+    <button class="action-button" id="slice" type="button" title="Slice layers">Slice layers</button>
+</body>
+
+</html>
