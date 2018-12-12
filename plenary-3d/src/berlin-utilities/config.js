@@ -63,16 +63,19 @@ define([
 
         {
 
-          title: "Adjust ground opacity with a slider",
+          title: "Explore data under ground",
 
           code:
            `
-const slider = document.getElementById("opacity-slider");
+  // allow underground navigation
+  webscene.ground.navigationConstraint = {
+    type: "none"
+  };
 
-slider.addEventListener("input", function(event) {
-  const value = parseFloat(event.target.value);
-  webscene.ground.opacity = value;
-});
+  // update ground opacity
+  on("slider-change", function (value){
+    webscene.ground.opacity = value;
+  });
 `,
           before: function () {
             const slider = document.getElementById("opacity-slider");
@@ -95,10 +98,8 @@ slider.addEventListener("input", function(event) {
           title: "Add line measurement tool",
 
           code: `
-const measurementWidget = new DirectLineMeasurement3D({
-  view: view
-});
-view.ui.add(measurementWidget, "top-left");
+const widget = new DirectLineMeasurement3D({ view: view });
+view.ui.add(widget, "top-left");
 `,
           before: function () {
             view.map.presentation.slides.getItemAt(0).applyTo(view);
