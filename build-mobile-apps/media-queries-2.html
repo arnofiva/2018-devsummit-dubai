@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+
+    <!-- 
+      
+        
+        With CSS Media queries you can conditionally load a certain part of your application
+        for example, this is how a conditional link to CSS file would look like:
+
+        <link rel="stylesheet" media="mediatype and|not|only (expressions)" href="conditional-style.css"> 
+
+    -->
+    
+    <link rel="stylesheet" href="css/style-common.css">
+    <link rel="stylesheet" media="screen and (orientation: landscape)" href="css/style-landscape.css">
+    <link rel="stylesheet" media="screen and (orientation: portrait)" href="css/style-portrait.css">
+
+
+</head>
+
+<body>
+    Wow, I detect the orientation!
+</body>
+
+</html>

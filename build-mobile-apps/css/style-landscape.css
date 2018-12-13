@@ -1,0 +1,8 @@
+/* Landscape screen styles */
+
+body {
+    background-color: rgb(211, 253, 200);
+    color: black;
+    padding-left: 40px;
+    padding-top: 0px;
+}
